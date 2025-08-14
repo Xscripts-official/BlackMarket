@@ -113,7 +113,7 @@ local function stopAutoAccept()
 end
 
 -- Create Buttons
-local grabButton = createToggleButton("Grab Gift", 35)
+local grabButton = createToggleButton("Loop Bring", 35)
 local acceptButton = createToggleButton("Auto Accept", 80)
 
 -- Button Toggles
@@ -121,11 +121,11 @@ grabButton.MouseButton1Click:Connect(function()
     isGrabOn = not isGrabOn
     if isGrabOn then
         grabButton.BackgroundColor3 = Color3.fromRGB(80, 200, 120) -- Green
-        grabButton.Text = "Gift Grabber: ON"
+        grabButton.Text = "Loop Bring: ON"
         startLoopBring()
     else
         grabButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80) -- Red
-        grabButton.Text = "Gift Grabber: OFF"
+        grabButton.Text = "Loop Bring: OFF"
         stopLoopBring()
     end
 end)
@@ -140,12 +140,5 @@ acceptButton.MouseButton1Click:Connect(function()
         acceptButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
         acceptButton.Text = "Auto Accept: OFF"
         stopAutoAccept()
-    end
-end)        toggleButton.Text = "ON"
-        startLoopBring()
-    else
-        toggleButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80) -- Red OFF
-        toggleButton.Text = "OFF"
-        stopLoopBring()
     end
 end)
