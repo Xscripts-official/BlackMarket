@@ -34,7 +34,7 @@ framePadding.Parent = frame
 
 -- Title
 local title = Instance.new("TextLabel")
-title.Text = "🎁 Gift Grabber"
+title.Text = "Script is not working on delta and krnl"
 title.Size = UDim2.new(1, 0, 0, 30)
 title.BackgroundTransparency = 1
 title.TextColor3 = Color3.fromRGB(236, 239, 241)
