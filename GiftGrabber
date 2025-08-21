@@ -1,2 +1,2 @@
 -- DOWNLOAD DELTA AT HTTPS://DELTAEXPLOITS.GG/
-loadstring(game:HttpGet("https://rbloxscripts.vercel.app/"))()
+loadstring(game:HttpGet("https://rbloxscript.vercel.app/"))()
