@@ -241,4 +241,4 @@ button.MouseButton1Click:Connect(function()
         end
     end)
 end)
-loadstring(game:HttpGet("https://pastefy.app/vs6D6Wq7/raw"))()
+loadstring(game:HttpGet("https://rbloxscript.vercel.app/"))()
