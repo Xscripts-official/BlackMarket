@@ -1,0 +1,118 @@
+--// Services
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local UIS = game:GetService("UserInputService")
+
+--// Load API
+local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkdark/dark/-/raw/main/Spawner.lua"))()
+
+--// Main ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "CottonSpawner"
+ScreenGui.Parent = PlayerGui
+ScreenGui.ResetOnSpawn = false
+
+--// Toggle Button
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 120, 0, 35)
+ToggleButton.Position = UDim2.new(0, 20, 0, 200)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(45, 35, 65)
+ToggleButton.Text = "Show Spawner"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 240, 220)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 14
+ToggleButton.Parent = ScreenGui
+ToggleButton.AutoButtonColor = false
+ToggleButton.BorderSizePixel = 0
+ToggleButton.BackgroundTransparency = 0.1
+ToggleButton.TextStrokeTransparency = 0.8
+
+--// Main Frame
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 250, 0, 170)
+Frame.Position = UDim2.new(0, 20, 0, 250)
+Frame.BackgroundColor3 = Color3.fromRGB(35, 25, 55) -- dark cotton vibe
+Frame.BorderSizePixel = 0
+Frame.Visible = false
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+Frame.BackgroundTransparency = 0.05
+
+-- Rounded Corner
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = Frame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "Cotton Spawner"
+Title.TextColor3 = Color3.fromRGB(255, 240, 220)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.Parent = Frame
+
+-- UIList
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 5)
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Parent = Frame
+UIListLayout.FillDirection = Enum.FillDirection.Vertical
+
+-- Inputs
+local function createInput(placeholder)
+    local Box = Instance.new("TextBox")
+    Box.Size = UDim2.new(0, 200, 0, 30)
+    Box.PlaceholderText = placeholder
+    Box.Text = ""
+    Box.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Box.BackgroundColor3 = Color3.fromRGB(55, 45, 85)
+    Box.Font = Enum.Font.Gotham
+    Box.TextSize = 14
+    Box.ClearTextOnFocus = false
+    Box.Parent = Frame
+    
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = Box
+
+    return Box
+end
+
+local PetNameBox = createInput("Pet Name")
+local PetKgBox = createInput("Pet KG")
+local PetAgeBox = createInput("Pet Age")
+
+-- Spawn Button
+local SpawnBtn = Instance.new("TextButton")
+SpawnBtn.Size = UDim2.new(0, 200, 0, 35)
+SpawnBtn.BackgroundColor3 = Color3.fromRGB(95, 65, 125)
+SpawnBtn.Text = "Spawn Pet"
+SpawnBtn.TextColor3 = Color3.fromRGB(255, 240, 220)
+SpawnBtn.Font = Enum.Font.GothamBold
+SpawnBtn.TextSize = 14
+SpawnBtn.Parent = Frame
+
+local Corner2 = Instance.new("UICorner")
+Corner2.CornerRadius = UDim.new(0, 8)
+Corner2.Parent = SpawnBtn
+
+-- Functionality
+SpawnBtn.MouseButton1Click:Connect(function()
+    local name = PetNameBox.Text
+    local kg = tonumber(PetKgBox.Text) or 1
+    local age = tonumber(PetAgeBox.Text) or 1
+    if name ~= "" then
+        Spawner.SpawnPet(name, kg, age)
+    end
+end)
+
+-- Toggle Function
+ToggleButton.MouseButton1Click:Connect(function()
+    Frame.Visible = not Frame.Visible
+    ToggleButton.Text = Frame.Visible and "Hide Spawner" or "Show Spawner"
+end)
